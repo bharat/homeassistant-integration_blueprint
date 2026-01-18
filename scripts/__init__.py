@@ -1,1 +1,1 @@
-"""Utility scripts for repository customization and setup."""
+"""Utility scripts for project maintenance."""

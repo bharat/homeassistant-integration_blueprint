@@ -427,6 +427,10 @@ def main() -> int:  # noqa: PLR0912, PLR0915
     )
     snake = to_snake_case(integration_input)
     camel = to_camel_caps(integration_input)
+    # Human-readable title with spaces: e.g., "foo_bar" -> "Foo Bar"
+    human_title = " ".join(
+        part[:1].upper() + part[1:].lower() for part in snake.split("_") if part
+    )
 
     print(f"Using integration identifiers -> snake_case: {snake}, CamelCaps: {camel}")
     if not confirm_yes_no("Proceed with these names?", default_yes=True):
@@ -480,8 +484,28 @@ def main() -> int:  # noqa: PLR0912, PLR0915
             ("IntegrationBlueprint", camel),
             ("Blueprint", camel),
         )
-        if replace_text_in_file(path, replacements) or replace_text_in_file(
-            path, extra_replacements
+        # .github-specific replacement for human-readable name
+        in_github = False
+        try:
+            path.relative_to(repo_root / ".github")
+            in_github = True
+        except ValueError:
+            in_github = False
+        # For release workflow title, use human-readable Title Case with spaces
+        is_release_workflow = in_github and path.name == "release.yml"
+        if is_release_workflow:
+            github_replacements: tuple[tuple[str, str], ...] = (
+                ("Integration blueprint", human_title),
+            )
+        elif in_github:
+            github_replacements = (("Integration blueprint", camel),)
+        else:
+            github_replacements = ()
+
+        if (
+            replace_text_in_file(path, replacements)
+            or replace_text_in_file(path, extra_replacements)
+            or (github_replacements and replace_text_in_file(path, github_replacements))
         ):
             changed_files += 1
 
