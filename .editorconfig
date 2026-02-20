@@ -1,0 +1,26 @@
+root = true
+
+[*]
+end_of_line = lf
+insert_final_newline = true
+charset = utf-8
+
+# YAML (GitHub Actions, configs)
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
+
+# JSON defaults
+[*.json]
+indent_style = space
+indent_size = 2
+
+# Explicitly ensure 2 spaces for devcontainer definitions
+[.devcontainer/devcontainer.json]
+indent_style = space
+indent_size = 2
+
+[.devcontainer.json]
+indent_style = space
+indent_size = 2
+
